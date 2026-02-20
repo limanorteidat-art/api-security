@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import pe.edu.idat.api_security.service.impl.DetalleUsuarioService;
 
 @RequiredArgsConstructor
@@ -33,7 +34,9 @@ public class SecurityConfig {
                                 "/api/v1/auth/login")
                                 .permitAll()
                                 .anyRequest().authenticated())
-                .authenticationProvider(daoAuth());
+                .authenticationProvider(daoAuth())
+                .addFilterBefore(new FiltroJwtAuth(jwt),
+                        UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

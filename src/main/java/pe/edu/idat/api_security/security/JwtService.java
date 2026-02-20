@@ -4,7 +4,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pe.edu.idat.api_security.model.Usuario;
 
@@ -64,6 +67,15 @@ public class JwtService implements  IJwtService {
 
     @Override
     public void generarAutenticacion(Claims claims) {
-
+        List<String> authorities = claims.get("authorities",
+                List.class);
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(
+                        claims.getSubject(),
+                        null,
+                        authorities.stream()
+                        .map(SimpleGrantedAuthority::new).toList()
+                );
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 }
