@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import pe.edu.idat.api_security.model.Usuario;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
@@ -38,13 +39,13 @@ public class JwtService implements  IJwtService {
 
     @Override
     public Claims obtenerClaims(String token) {
-
-        return null;
+        return Jwts.parser().verifyWith((SecretKey)KEY).build()
+                .parseSignedClaims(token).getPayload();
     }
-
     @Override
     public boolean tokenValido(String token) {
         try{
+            obtenerClaims(token);
             return true;
         } catch (Exception e) {
             return false;
@@ -53,7 +54,12 @@ public class JwtService implements  IJwtService {
 
     @Override
     public String extraerToken(HttpServletRequest request) {
-        return "";
+        String header = request.getHeader("Authorization");
+        //Bearer aksjdaidjjiweiqw.sdjsaiodqwijeiqu8437843.sdhaidi
+        if(header != null && header.startsWith("Bearer ")){
+            return header.substring(7);
+        }
+        return null;
     }
 
     @Override
